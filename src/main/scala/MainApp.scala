@@ -54,6 +54,7 @@ object MainApp {
     //val df2 = df.filter("appOrSite is not null")
 
     /* Here we have to clean datas with .filter() */
+    val myDatas = df.map(x => schemaData(x(1).toString, x(2), x(3).toString, x(4).toString, x(5).toString, x(6).toString, x(7).toInt, x(8).toString, x(9).toString, x(10).toString, x(11).to, x(12), x(13), x(14), x(15))).toDF()
     // Maybe try to convert label to Int or to String
 
     //tranformor to convert string to category values
