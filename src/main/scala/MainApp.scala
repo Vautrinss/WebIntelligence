@@ -1,5 +1,8 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.SparkContext._
+import org.apache.spark.sql._
+
 
 import org.apache.spark.sql.functions.desc
 
@@ -14,7 +17,7 @@ import org.apache.spark.ml.feature.VectorSlicer
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.feature.StandardScaler
 
-
+import org.apache.spark.sql.types._
 
 
 object MainApp {
@@ -52,9 +55,14 @@ object MainApp {
 
     val df: DataFrame = spark.read.json("./data-students.json")
     //val df2 = df.filter("appOrSite is not null")
+    val myRDD = df.rdd
+    //myRDD.take(20).foreach(println)
+    val myDatas = myRDD.map{x: Row => x.split(",")}.take(5)
+    myDatas.foreach(println)
+    //val myDatas = myRDD.map(x => schemaData(x(1), x(2), x(3).toString, x(4).toString, x(5).toString, x(6).toString, x(7).toInt, x(8).toString, x(9).toString, x(10).toString, x(11).to, x(12), x(13), x(14), x(15))).toDF()
 
+/*
     /* Here we have to clean datas with .filter() */
-    val myDatas = df.map(x => schemaData(x(1).toString, x(2), x(3).toString, x(4).toString, x(5).toString, x(6).toString, x(7).toInt, x(8).toString, x(9).toString, x(10).toString, x(11).to, x(12), x(13), x(14), x(15))).toDF()
     // Maybe try to convert label to Int or to String
 
     //tranformor to convert string to category values
@@ -145,7 +153,7 @@ object MainApp {
 
     //df.groupBy("label", "appOrSite").count().orderBy(desc("count")).show()
 
-
+*/
   }
 }
 
