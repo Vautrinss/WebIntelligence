@@ -51,15 +51,22 @@ object MainApp {
                             user: String
                           )
 
-
+    case class schemaData2 (
+                            appOrSite: String,
+                            bidfloor: Double
+                          )
 
     val df: DataFrame = spark.read.json("./data-students.json")
     //val df2 = df.filter("appOrSite is not null")
     val myRDD = df.rdd
     //myRDD.take(20).foreach(println)
-    val myDatas = myRDD.map{x: Row => x.split(",")}.take(5)
-    myDatas.foreach(println)
-    //val myDatas = myRDD.map(x => schemaData(x(1), x(2), x(3).toString, x(4).toString, x(5).toString, x(6).toString, x(7).toInt, x(8).toString, x(9).toString, x(10).toString, x(11).to, x(12), x(13), x(14), x(15))).toDF()
+    val myDatas2 = myRDD.map{x => x(6)}.take(5)
+    myDatas2.foreach(println)
+
+    val myDataEssai = myRDD.map{x => schemaData2(x(0).toString, x(1).asInstanceOf[Double])}
+    myDataEssai.take(20).foreach(println)
+    //val myDatas = myRDD.map{x =>
+      //schemaData(x(0).toString, x(1).toString.toDouble, x(2).toString, x(3).toString, x(4).toString, x(5).toString, x(6).toString.toBoolean, x(7).toString, x(8).toString, x(9).toString, x(10).toString, x(11).asInstanceOf[], x(12).toString, x(13).toString, x(14).toString)}.toDF()
 
 /*
     /* Here we have to clean datas with .filter() */
