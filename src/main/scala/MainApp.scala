@@ -25,15 +25,32 @@ object MainApp {
 
   def main(args: Array[String]) {
 
-    implicit val spark: SparkSession = SparkSession
+    val spark: SparkSession = SparkSession
       .builder()
       .appName("WebIntelligence")
       .master("local[*]")
       .config("spark.executor.memory", "15g")
       .getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
+    import spark.implicits._
 
     case class schemaData (
+                            appOrSite: String,
+                            bidfloor: Double,
+                            city: String,
+                            exchange: String,
+                            impid: String,
+                            interests: String,
+                            label: String,
+                            media: String,
+                            network: String,
+                            os: String,
+                            publisher: String,
+                            typeI: String,
+                            user: String
+                          )
+
+    case class schemaData2 (
                             appOrSite: String,
                             bidfloor: Double,
                             city: String,
@@ -45,30 +62,45 @@ object MainApp {
                             network: String,
                             os: String,
                             publisher: String,
-                            size: Array[Long],
-                            timestamp: Long,
-                            typeI: String,
-                            user: String
-                          )
-
-    case class schemaData2 (
-                            appOrSite: String,
-                            bidfloor: Double
-                          )
+                            timestamp: Long
+                           )
 
     val df: DataFrame = spark.read.json("./data-students.json")
     //val df2 = df.filter("appOrSite is not null")
+    df.drop("size")
+    df.drop("timestamp")
+    val mm = df.select($"label" cast "string").as[schemaData]
+
+    mm.show(10)
     val myRDD = df.rdd
     //myRDD.take(20).foreach(println)
-    val myDatas2 = myRDD.map{x => x(6)}.take(5)
-    myDatas2.foreach(println)
+    //val myDatas2 = df.map{x => x(6)}.take(5)
+    //myDatas2.foreach(println)
+    //df.where(df("city").isNull).groupBy("label", "city").count().orderBy(desc("count")).show(500, false)
 
-    val myDataEssai = myRDD.map{x => schemaData2(x(0).toString, x(1).asInstanceOf[Double])}
-    myDataEssai.take(20).foreach(println)
-    //val myDatas = myRDD.map{x =>
-      //schemaData(x(0).toString, x(1).toString.toDouble, x(2).toString, x(3).toString, x(4).toString, x(5).toString, x(6).toString.toBoolean, x(7).toString, x(8).toString, x(9).toString, x(10).toString, x(11).asInstanceOf[], x(12).toString, x(13).toString, x(14).toString)}.toDF()
+    /*val myDataEssai = myRDD
+      .filter(t => t(2) != null)
+      .filter(t => t(3) != null)
+      .filter(t => t(4) != null)
+      .filter(t => t(11) != null)
 
+      .map{x => schemaData2(x(0).toString, x(1).asInstanceOf[Double], x(2).toString, x(3).toString, x(4).toString, x(5).toString, x(6).asInstanceOf[Boolean], x(7).toString, x(8).toString, x(9).toString, x(10).toString, x(11).asInstanceOf[Long])}
+    myDataEssai.take(5).foreach(println)*/
 /*
+    val myDatas = spark.read.json("./data-students.json").drop("size").drop("timestamp")
+      .filter(t => t(2) != null)
+      .filter(t => t(3) != null)
+      .filter(t => t(4) != null)
+      .filter(t => t(5) != null)
+      .filter(t => t(7) != null)
+      .filter(t => t(8) != null)
+      .filter(t => t(9) != null)
+      .filter(t => t(10) != null)
+      .filter(t => t(12) != null)
+      .map(x =>
+      schemaData(x(0).toString, x(1).asInstanceOf[Double], x(2).toString, x(3).toString, x(4).toString, x(5).toString, x(6).toString, x(7).toString, x(8).toString, x(9).toString, x(10).toString, x(11).toString, x(12).toString)).toDF
+    myDatas.take(5).foreach(println)
+
     /* Here we have to clean datas with .filter() */
     // Maybe try to convert label to Int or to String
 
@@ -85,7 +117,6 @@ object MainApp {
     val publisherIndexer = new StringIndexer().setInputCol("publisher").setOutputCol("publisherCat")
     val typeIndexer = new StringIndexer().setInputCol("type").setOutputCol("typeCat")
     val userIndexer = new StringIndexer().setInputCol("user").setOutputCol("userCat")
-    //val labelIndexer = new StringIndexer().setInputCol("label").setOutputCol("labelIndexer")
 
 
     //val df4 = appOrSiteIndexer.transform(df)
@@ -148,7 +179,7 @@ object MainApp {
       userIndexer,
       assembler, slicer, scaler, binarizerClassifier, lr))
     // Train model.
-    val lrModel = lrPipeline.fit(df)
+    val lrModel = lrPipeline.fit(myDatas)
     // Make predictions.
     val lrPredictions = lrModel.transform(df)
     // Select example rows to display.
