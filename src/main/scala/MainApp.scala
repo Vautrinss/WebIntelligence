@@ -182,6 +182,22 @@ object MainApp {
     df = df.na.fill("null", Seq("publisher"))
     df = df.na.fill("null", Seq("type"))
     df = df.na.fill(0.0, Seq("bidfloor"))
+      
+      
+      val ajuster2 = udf((col: String) => {
+      val values = col.split(",")
+      var result = "null"
+       if (values.nonEmpty) {
+         var i = 0
+         while (i < values.length && result == "null") {
+           if (!values(i).startsWith("IAB")) result = values(i)
+             i = i + 1
+         }
+         result
+       }
+       else "null"
+      })
+     df = df.withColumn("interests", ajuster2(df("interests")))
 
 
 
