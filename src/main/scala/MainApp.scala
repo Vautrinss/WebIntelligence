@@ -1,11 +1,9 @@
-import org.apache.spark.ml.feature.{IndexToString, QuantileDiscretizer, StringIndexer, VectorAssembler, VectorIndexer}
+import org.apache.spark.ml.feature.{QuantileDiscretizer, VectorAssembler}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, DecisionTreeClassifier, RandomForestClassificationModel, RandomForestClassifier}
-import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
-import org.apache.spark.sql.functions.{col, concat_ws, udf}
+import org.apache.spark.sql.functions.{udf}
 
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.{GBTClassificationModel, GBTClassifier}
@@ -27,26 +25,6 @@ object MainApp {
       .getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    case class schemaData(
-                           appOrSite: String,
-                           bidfloor: Double,
-                           city: String,
-                           exchange: String,
-                           impid: String,
-                           interests: String,
-                           label: Boolean,
-                           media: String,
-                           network: String,
-                           os: String,
-                           publisher: String,
-                           size: Array[Long],
-                           timestamp: Long,
-                           typeI: String,
-                           user: String
-                         )
-
-
-
 
     val rightName = HashMap(
       "android" -> "ANDROID",
@@ -64,7 +42,7 @@ object MainApp {
       "Rim" -> "BLACKBERRY",
       "ios" -> "IOS",
       "Bada" -> "BADA",
-      "null" -> "NULL",
+      "null" -> "UNKNOWN",
       "windows" -> "WINDOWS"
     )
 
