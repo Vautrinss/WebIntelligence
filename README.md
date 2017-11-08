@@ -1,5 +1,4 @@
 # WebIntelligence
-Web Inelligence Project with Scala, Spark and mlib
 
 Team : Leo Pernelle, Jean Brute de Remur, Erick Taru, Jean Miquel, Baptiste Vautrin
 
